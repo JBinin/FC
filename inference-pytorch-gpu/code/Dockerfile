@@ -1,0 +1,4 @@
+FROM nvcr.io/nvidia/pytorch:21.10-py3
+WORKDIR /usr/src/app
+COPY . .
+CMD [ "python3", "-u", "/usr/src/app/app.py" ]

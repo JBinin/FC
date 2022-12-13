@@ -1,0 +1,55 @@
+{
+  "statefulConfig": {
+    "functionId": "f9c2fb26-91f3-429d-9643-cebbb257884f",
+    "functionName": "resnet50",
+    "description": "hello world by serverless devs",
+    "runtime": "custom-container",
+    "handler": "index.handler",
+    "timeout": 60,
+    "initializer": "",
+    "initializationTimeout": 3,
+    "codeSize": 0,
+    "codeChecksum": "",
+    "memorySize": 1536,
+    "gpuMemorySize": null,
+    "cpu": 1.5,
+    "diskSize": 512,
+    "environmentVariables": {},
+    "createdTime": "2022-12-12T13:11:11Z",
+    "lastModifiedTime": "2022-12-13T03:37:01Z",
+    "instanceConcurrency": 1,
+    "instanceSoftConcurrency": null,
+    "customContainerConfig": {
+      "accelerationInfo": {
+        "status": "Ready"
+      },
+      "accelerationType": "Default",
+      "args": null,
+      "command": null,
+      "image": "registry.cn-shanghai.aliyuncs.com/gpu-inference/pytorch-inference",
+      "imageAcclConfig": null,
+      "instanceID": null,
+      "instancePrivateDNS": null,
+      "serverlessImage": null,
+      "webServerMode": true
+    },
+    "caPort": 9000,
+    "instanceType": "e1",
+    "layers": null,
+    "layersArnV2": null,
+    "instanceLifecycleConfig": {
+      "preFreeze": {
+        "handler": "",
+        "timeout": 3
+      },
+      "preStop": {
+        "handler": "",
+        "timeout": 3
+      }
+    },
+    "customDNS": null,
+    "customRuntimeConfig": null,
+    "customHealthCheckConfig": null,
+    "name": "resnet50"
+  }
+}
