@@ -6,21 +6,20 @@ import sys
 import traceback
 from flask import Flask, request
 from PIL import Image
+import json
 
 import urllib.request
 
 logging.basicConfig(level=logging.INFO)
 
-url, filename = ("https://inference.oss-cn-shanghai.aliyuncs.com/origin/dog.jpg", "dog.jpg")
-try: urllib.request.URLopener().retrieve(url, filename)
-except: urllib.request.urlretrieve(url, filename)
-
 app = Flask(__name__)
 
+logging.info("Starting load model")
 model = torchvision.models.resnet50()
 model.eval()
 if torch.cuda.is_available():
     model.to('cuda')
+logging.info("Finishing load model")
 
 preprocess = transforms.Compose([
     transforms.Resize(256),
@@ -60,20 +59,33 @@ def invoke():
     try:
         # do your things, for example:
         print(event_str)
-        batch_size = 4
-        input_image = Image.open(filename)
+        data = json.loads(event_str)
+        batch_size = data["BS"]
         input_batch = []
+
+        logging.info("Preparing input batch")
+
         for i in range(batch_size):
+            url, filename = ("https://inference.oss-cn-shanghai.aliyuncs.com/origin/dog.jpg", str(i) + ".jpg")
+            try: urllib.request.URLopener().retrieve(url, filename)
+            except: urllib.request.urlretrieve(url, filename)
+            input_image = Image.open(filename)
             input_tensor = preprocess(input_image)
             input_batch.append(input_tensor.unsqueeze(0))
         input_batch = torch.cat(input_batch, dim=0)
-        print(input_batch.shape)
+        logging.info("Finishing input batch")
+
         if torch.cuda.is_available():
+            logging.info("Starting input transfer")
             input_batch = input_batch.to('cuda')
+            logging.info("Finishing input")
+
+        logging.info("Starting inference")
         with torch.no_grad():
             output = model(input_batch)
-        print(output.shape)
-
+        logging.info("Finishing inference")
+        _, index = torch.max(output, 1)
+        print(index)
     except Exception as e:
         exc_info = sys.exc_info()
         trace = traceback.format_tb(exc_info[2])

@@ -25,6 +25,7 @@ vars: # 全局变量
   region: "cn-shanghai"
   service:
     name: "inference-pytorch-gpu-service"
+    logConfig: auto
 
 services:
   ai-project: # 业务名称/模块名称
