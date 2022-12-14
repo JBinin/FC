@@ -7,19 +7,27 @@ import traceback
 from flask import Flask, request
 from PIL import Image
 import json
+import time
 
 import urllib.request
 
 logging.basicConfig(level=logging.INFO)
 
+def print_duration(start, end, info):
+    t = end - start
+    print(info + ", " + str(int(round(t * 1000))))
+
 app = Flask(__name__)
 
-logging.info("Starting load model")
+time_stamp1 = time.time()
 model = torchvision.models.resnet50()
 model.eval()
+
 if torch.cuda.is_available():
     model.to('cuda')
-logging.info("Finishing load model")
+
+time_stamp2 = time.time()
+print_duration(time_stamp1, time_stamp2, "model load")
 
 preprocess = transforms.Compose([
     transforms.Resize(256),
@@ -63,8 +71,6 @@ def invoke():
         batch_size = data["BS"]
         input_batch = []
 
-        logging.info("Preparing input batch")
-
         for i in range(batch_size):
             url, filename = ("https://inference.oss-cn-shanghai.aliyuncs.com/origin/dog.jpg", str(i) + ".jpg")
             try: urllib.request.URLopener().retrieve(url, filename)
@@ -73,17 +79,16 @@ def invoke():
             input_tensor = preprocess(input_image)
             input_batch.append(input_tensor.unsqueeze(0))
         input_batch = torch.cat(input_batch, dim=0)
-        logging.info("Finishing input batch")
 
         if torch.cuda.is_available():
-            logging.info("Starting input transfer")
             input_batch = input_batch.to('cuda')
-            logging.info("Finishing input")
 
-        logging.info("Starting inference")
+        time_stamp3 = time.time()
         with torch.no_grad():
             output = model(input_batch)
-        logging.info("Finishing inference")
+        time_stamp4 = time.time()
+        print_duration(time_stamp3, time_stamp4, "inference")
+
         _, index = torch.max(output, 1)
         print(index)
     except Exception as e:
