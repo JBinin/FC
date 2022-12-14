@@ -55,7 +55,7 @@ services:
         instanceType: g1
         runtime: custom-container
         customContainerConfig:
-          image: "registry.cn-shanghai.aliyuncs.com/gpu-inference/pytorch-inference:gpu"
+          image: "registry-vpc.cn-shanghai.aliyuncs.com/inference-ns/inference-images:gpu"
         codeUri: ./code
 
 #  next-function: # 第二个函数的案例，仅供参考

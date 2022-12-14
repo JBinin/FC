@@ -55,7 +55,7 @@ services:
         diskSize: 512
         runtime: custom-container
         customContainerConfig:
-          image: "registry.cn-shanghai.aliyuncs.com/gpu-inference/pytorch-inference"
+          image: "registry-vpc.cn-shanghai.aliyuncs.com/inference-ns/inference-images:cpu"
         codeUri: ./code
 
 #  next-function: # 第二个函数的案例，仅供参考

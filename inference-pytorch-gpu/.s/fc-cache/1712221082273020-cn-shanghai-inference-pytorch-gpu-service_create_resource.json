@@ -1,6 +1,0 @@
-{
-  "serviceName": "inference-pytorch-gpu-service",
-  "functionNames": [
-    "inference-pytorch-gpu-service/resnet50-gpu"
-  ]
-}

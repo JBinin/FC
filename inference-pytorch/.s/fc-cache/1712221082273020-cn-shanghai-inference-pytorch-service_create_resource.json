@@ -1,6 +1,0 @@
-{
-  "serviceName": "inference-pytorch-service",
-  "functionNames": [
-    "inference-pytorch-service/resnet50"
-  ]
-}
