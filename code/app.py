@@ -82,10 +82,13 @@ def invoke():
 
         if torch.cuda.is_available():
             input_batch = input_batch.to('cuda')
+            torch.cuda.synchronize()
 
         time_stamp3 = time.time()
         with torch.no_grad():
             output = model(input_batch)
+        if torch.cuda.is_available():
+            torch.cuda.synchronize()
         time_stamp4 = time.time()
         print_duration(time_stamp3, time_stamp4, "inference")
 
