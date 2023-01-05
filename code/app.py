@@ -71,14 +71,10 @@ def invoke():
         batch_size = data["BS"]
         input_batch = []
 
-        time_download1 = time.time()
         for i in range(batch_size):
             url, filename = ("https://inference.oss-cn-shanghai-internal.aliyuncs.com/origin/dog.jpg", str(i) + ".jpg")
             try: urllib.request.URLopener().retrieve(url, filename)
             except: urllib.request.urlretrieve(url, filename)
-        time_download2 = time.time()
-        print_duration(time_download1, time_download2, "download")
-
         
         for i in range(batch_size):
             filename = str(i) + ".jpg"
@@ -88,8 +84,6 @@ def invoke():
         input_batch = torch.cat(input_batch, dim=0)
 
         time_stamp3 = time.time()
-
-        print_duration(time_download2, time_stamp3, "preprocess")
 
         if torch.cuda.is_available():
             input_batch = input_batch.to('cuda')
