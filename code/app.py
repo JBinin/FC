@@ -72,7 +72,7 @@ def invoke():
         input_batch = []
 
         for i in range(batch_size):
-            url, filename = ("https://inference.oss-cn-shanghai.aliyuncs.com/origin/dog.jpg", str(i) + ".jpg")
+            url, filename = ("https://inference.oss-cn-shanghai-internal.aliyuncs.com/origin/dog.jpg", str(i) + ".jpg")
             try: urllib.request.URLopener().retrieve(url, filename)
             except: urllib.request.urlretrieve(url, filename)
             input_image = Image.open(filename)
