@@ -1,8 +1,8 @@
 FROM python:latest
 WORKDIR /usr/src/app
 RUN apt-get update && apt-get install python-dev -y
+RUN pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu 
 RUN python3 -m pip install --upgrade pip && \
-    pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu && \
     python3 -m pip install --upgrade Pillow && \
     pip install flask && \
     pip install oss2
