@@ -91,30 +91,33 @@ def invoke():
                 input_tensor = preprocess(input_image)
                 input_batch.append(input_tensor.unsqueeze(0))
             input_batch = torch.cat(input_batch, dim=0)
+            time_stamp4 = time.time()
+            print_duration(time_stamp3, time_stamp4, "p-download")
             torch.save(input_batch, "/tmp/input_batch.pth")
             save_path = "inference/input_batch.pth"
             bucket.put_object_from_file(save_path, "/tmp/input_batch.pth")
-            time_stamp4 = time.time()
-            print_duration(time_stamp3, time_stamp4, "pre")
+            time_stamp5 = time.time()
+            print_duration(time_stamp4, time_stamp5, "t-upload")
         elif Func == "inf":
             if "INPUT" in data:
                 input_oss = data["INPUT"]
             else:
                 input_oss = "inference/input_batch.pth"
             input_file = "/tmp/input_batch.pth"
-            bucket.get_object_to_file(input_oss, input_file)
-            bucket.delete_object(input_oss)
-            input_batch = torch.load(input_file)
-
             time_stamp3 = time.time()
+            bucket.get_object_to_file(input_oss, input_file)
+            # bucket.delete_object(input_oss)
+            time_stamp4 = time.time()
+            input_batch = torch.load(input_file)
+            print_duration(time_stamp3, time_stamp4, "t-download")
             if torch.cuda.is_available():
                 input_batch = input_batch.to('cuda')
             with torch.no_grad():
                 output = model(input_batch)
             if torch.cuda.is_available():
                 torch.cuda.synchronize()
-            time_stamp4 = time.time()
-            print_duration(time_stamp3, time_stamp4, "inference")
+            time_stamp5 = time.time()
+            print_duration(time_stamp4, time_stamp5, "inference")
             _, index = torch.max(output, 1)
         else:
             input_batch = []
