@@ -1,9 +1,0 @@
-FROM nvcr.io/nvidia/pytorch:22.11-py3
-WORKDIR /usr/src/app
-RUN apt-get update && \
-    apt-get install python-dev -y
-RUN python3 -m pip install --upgrade pip && \
-    pip install flask && \
-    pip install oss2
-COPY split/inference.py app.py
-CMD [ "python3", "-u", "/usr/src/app/app.py" ]
