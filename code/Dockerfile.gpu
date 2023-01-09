@@ -3,6 +3,7 @@ WORKDIR /usr/src/app
 RUN apt-get update && \
     apt-get install python-dev -y
 RUN python3 -m pip install --upgrade pip && \
+    python3 -m pip install --upgrade Pillow && \
     pip install flask && \
     pip install oss2
 COPY app.py app.py
