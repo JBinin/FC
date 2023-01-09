@@ -95,7 +95,7 @@ def invoke():
             save_path = "inference/input_batch.pth"
             bucket.put_object_from_file(save_path, "/tmp/input_batch.pth")
             time_stamp4 = time.time()
-            print(time_stamp3, time_stamp4, "pre")
+            print_duration(time_stamp3, time_stamp4, "pre")
         elif Func == "inf":
             if "INPUT" in data:
                 input_oss = data["INPUT"]
