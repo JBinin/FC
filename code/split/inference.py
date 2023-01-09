@@ -1,21 +1,21 @@
 import torch
 import torchvision
-from torchvision import transforms
 import logging
 import sys
 import traceback
 from flask import Flask, request
-from PIL import Image
 import json
-import time
 import crcmod._crcfunext
 import oss2
+import time
+
+
+logging.basicConfig(level=logging.INFO)
 
 auth = oss2.Auth("LTAI5tJzaLyUFaQuaauNnMHW", "Fzq9zVqs1rUtDEwjhzcfq47Z3srLFX")
 endpoint = "https://oss-cn-shanghai-internal.aliyuncs.com"
 bucket = oss2.Bucket(auth, endpoint, "inference")
 
-logging.basicConfig(level=logging.INFO)
 
 def print_duration(start, end, info):
     t = end - start
@@ -32,13 +32,6 @@ if torch.cuda.is_available():
 
 time_stamp2 = time.time()
 print_duration(time_stamp1, time_stamp2, "model load")
-
-preprocess = transforms.Compose([
-    transforms.Resize(256),
-    transforms.CenterCrop(224),
-    transforms.ToTensor(),
-    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-])
 
 @app.route('/initialize', methods=['POST'])
 def initialize():
@@ -73,21 +66,16 @@ def invoke():
         print(event_str)
         data = json.loads(event_str)
         batch_size = data["BS"]
-        input_batch = []
-
-        for i in range(batch_size):
-            filename = str(i) + ".jpg"
-            bucket.get_object_to_file("origin/dog.jpg", filename)
-        
-        for i in range(batch_size):
-            filename = str(i) + ".jpg"
-            input_image = Image.open(filename)
-            input_tensor = preprocess(input_image)
-            input_batch.append(input_tensor.unsqueeze(0))
-        input_batch = torch.cat(input_batch, dim=0)
+        if "INPUT" in data:
+            input_oss = data["INPUT"]
+        else:
+            input_oss = "inference/input_batch.pth"
+        input_file = "/tmp/input_batch.pth"
+        bucket.get_object_to_file(input_oss, input_file)
+        bucket.delete_object(input_oss)
+        input_batch = torch.load(input_file)
 
         time_stamp3 = time.time()
-
         if torch.cuda.is_available():
             input_batch = input_batch.to('cuda')
         

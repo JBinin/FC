@@ -1,37 +1,26 @@
 import torch
-import torchvision
 from torchvision import transforms
 import logging
 import sys
 import traceback
 from flask import Flask, request
-from PIL import Image
 import json
 import time
 import crcmod._crcfunext
 import oss2
+from PIL import Image
+
+logging.basicConfig(level=logging.INFO)
 
 auth = oss2.Auth("LTAI5tJzaLyUFaQuaauNnMHW", "Fzq9zVqs1rUtDEwjhzcfq47Z3srLFX")
 endpoint = "https://oss-cn-shanghai-internal.aliyuncs.com"
 bucket = oss2.Bucket(auth, endpoint, "inference")
-
-logging.basicConfig(level=logging.INFO)
 
 def print_duration(start, end, info):
     t = end - start
     print(info + ", " + str(int(round(t * 1000))))
 
 app = Flask(__name__)
-
-time_stamp1 = time.time()
-model = torchvision.models.resnet50()
-model.eval()
-
-if torch.cuda.is_available():
-    model.to('cuda')
-
-time_stamp2 = time.time()
-print_duration(time_stamp1, time_stamp2, "model load")
 
 preprocess = transforms.Compose([
     transforms.Resize(256),
@@ -75,6 +64,8 @@ def invoke():
         batch_size = data["BS"]
         input_batch = []
 
+        time_stamp1 = time.time()
+        
         for i in range(batch_size):
             filename = str(i) + ".jpg"
             bucket.get_object_to_file("origin/dog.jpg", filename)
@@ -86,19 +77,14 @@ def invoke():
             input_batch.append(input_tensor.unsqueeze(0))
         input_batch = torch.cat(input_batch, dim=0)
 
-        time_stamp3 = time.time()
-
-        if torch.cuda.is_available():
-            input_batch = input_batch.to('cuda')
+        torch.save(input_batch, "/tmp/input_batch.pth")
+        save_path = "inference/input_batch.pth"
+        bucket.put_object_from_file(save_path, "/tmp/input_batch.pth")
         
-        with torch.no_grad():
-            output = model(input_batch)
-        if torch.cuda.is_available():
-            torch.cuda.synchronize()
-        time_stamp4 = time.time()
-        print_duration(time_stamp3, time_stamp4, "inference")
+        time_stamp2 = time.time()
 
-        _, index = torch.max(output, 1)
+        print(time_stamp1, time_stamp2, "inference")
+    
 
     except Exception as e:
         exc_info = sys.exc_info()
